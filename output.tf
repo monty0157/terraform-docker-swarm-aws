@@ -51,3 +51,7 @@ output "daemon_cert_request_pems" {
   value       = tls_cert_request.daemons.*.cert_request_pem
 }
 
+output "base_ami" {
+  description = "This is the AMI used by the worker nodes. Can be used to add other seperate servers to the cluster, e.g. for an external database"
+  value = data.aws_ami.base_ami.id
+}
