@@ -5,13 +5,20 @@ provider "template" {
 locals {
   dns_name       = lower(replace(var.name, " ", "-"))
   s3_bucket_name = var.s3_bucket_name != "" ? var.s3_bucket_name : "${local.dns_name}.terraform"
-  security_group_ids = concat(
-    var.exposed_security_group_ids,
-    [aws_security_group.docker.id],
+  # security_group_ids = concat(
+  #   var.exposed_security_group_ids,
+  #   [aws_security_group.docker.id],
+  # )
+  # daemon_security_group_ids = concat(
+  #   var.exposed_security_group_ids,
+  #   [aws_security_group.docker.id, aws_security_group.daemon.id],
+  # )
+
+  security_group_ids_workers = concat(
+    var.security_group_ids_workers,
   )
-  daemon_security_group_ids = concat(
-    var.exposed_security_group_ids,
-    [aws_security_group.docker.id, aws_security_group.daemon.id],
+  security_group_ids_managers = concat(
+    var.security_group_ids_managers,
   )
 }
 
@@ -81,64 +88,64 @@ resource "aws_s3_bucket" "terraform" {
   }
 }
 
-resource "aws_security_group" "docker" {
-  name        = "docker"
-  description = "Docker Swarm ports"
-  vpc_id      = var.vpc_id
+# resource "aws_security_group" "docker" {
+#   name        = "docker"
+#   description = "Docker Swarm ports"
+#   vpc_id      = var.vpc_id
 
-  ingress {
-    security_groups = var.exposed_security_group_ids
-    description      = ""
-    from_port        = 0
-    ipv6_cidr_blocks = []
-    prefix_list_ids  = []
-    protocol         = "tcp"
-    self             = false
-    to_port          = 65535
-  }
+#   ingress {
+#     security_groups = var.exposed_security_group_ids
+#     description      = ""
+#     from_port        = 0
+#     ipv6_cidr_blocks = []
+#     prefix_list_ids  = []
+#     protocol         = "tcp"
+#     self             = false
+#     to_port          = 65535
+#   }
 
-  ingress {
-    security_groups = var.exposed_security_group_ids
-    description      = ""
-    from_port        = 0
-    ipv6_cidr_blocks = []
-    prefix_list_ids  = []
-    protocol         = "udp"
-    self             = false
-    to_port          = 65535
-  }
+#   ingress {
+#     security_groups = var.exposed_security_group_ids
+#     description      = ""
+#     from_port        = 0
+#     ipv6_cidr_blocks = []
+#     prefix_list_ids  = []
+#     protocol         = "udp"
+#     self             = false
+#     to_port          = 65535
+#   }
 
-  tags = {
-    Name = "${var.name} Docker"
-  }
+#   tags = {
+#     Name = "${var.name} Docker"
+#   }
 
-  timeouts {
-    create = "2m"
-    delete = "2m"
-  }
-}
+#   timeouts {
+#     create = "2m"
+#     delete = "2m"
+#   }
+# }
 
-resource "aws_security_group" "daemon" {
-  name        = "docker-daemon"
-  description = "Docker Daemon port"
-  vpc_id      = var.vpc_id
+# resource "aws_security_group" "daemon" {
+#   name        = "docker-daemon"
+#   description = "Docker Daemon port"
+#   vpc_id      = var.vpc_id
 
-  ingress {
-    from_port   = 2376
-    to_port     = 2376
-    protocol    = "tcp"
-    cidr_blocks = [var.daemon_cidr_block]
-  }
+#   ingress {
+#     from_port   = 2376
+#     to_port     = 2376
+#     protocol    = "tcp"
+#     cidr_blocks = [var.daemon_cidr_block]
+#   }
 
-  tags = {
-    Name = "${var.name} Docker Daemon"
-  }
+#   tags = {
+#     Name = "${var.name} Docker Daemon"
+#   }
 
-  timeouts {
-    create = "2m"
-    delete = "2m"
-  }
-}
+#   timeouts {
+#     create = "2m"
+#     delete = "2m"
+#   }
+# }
 
 data "aws_iam_policy_document" "instance-assume-role-policy" {
   statement {

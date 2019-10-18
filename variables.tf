@@ -26,10 +26,16 @@ variable "cloud_config_extra_script" {
   default     = ""
 }
 
-variable "exposed_security_group_ids" {
-  description = "These are security groups that are applied to the Docker swarm nodes primarily for accessing other resources or exposing to the Internet. (The variable name is kept for legacy reasons, but will be renamed to `additional_security_group_ids` the future)"
+variable "security_group_ids_workers" {
+  description = "These are security groups that are applied to the Docker swarm workers."
   type        = list(string)
 }
+
+variable "security_group_ids_managers" {
+  description = "These are security groups that are applied to the Docker swarm managers"
+  type        = list(string)
+}
+
 
 variable "s3_bucket_name" {
   description = "The S3 bucket name, if not specified it will be the DNS name with .terraform added to the end."

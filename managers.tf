@@ -56,10 +56,7 @@ resource "aws_instance" "managers" {
   )
 
   # workaround as noted by https://github.com/hashicorp/terraform/issues/12453#issuecomment-284273475
-  vpc_security_group_ids = split(
-    ",",
-    count.index < var.daemon_count ? join(",", local.daemon_security_group_ids) : join(",", local.security_group_ids),
-  )
+  vpc_security_group_ids = local.security_group_ids_managers
 
   iam_instance_profile = aws_iam_instance_profile.ec2.name
   user_data_base64     = data.template_cloudinit_config.managers[count.index].rendered

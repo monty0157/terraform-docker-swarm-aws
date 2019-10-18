@@ -53,7 +53,7 @@ resource "aws_instance" "workers" {
     10 + count.index,
   )
 
-  vpc_security_group_ids = local.security_group_ids
+  vpc_security_group_ids = local.security_group_ids_workers
 
   iam_instance_profile = aws_iam_instance_profile.ec2.name
   user_data_base64     = data.template_cloudinit_config.workers[count.index].rendered
